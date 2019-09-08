@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Weather</string>
+    <string name="feels_like">Feels Like:</string>
+    <string name="low">Low:</string>
+    <string name="high">High:</string>
+    <string name="symbol_fahrenheit">℉</string>
+    <string name="symbol_celsius">℃</string>
+    <string name="location_permission">Location permission</string>
+</resources>
