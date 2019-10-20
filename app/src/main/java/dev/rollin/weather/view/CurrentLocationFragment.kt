@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 import dev.rollin.weather.R
 import dev.rollin.weather.constant.TempUnits
@@ -21,6 +23,7 @@ class CurrentLocationFragment : Fragment()
     private var currentUnit = TempUnits.C
     private lateinit var locationUtil: LocationUtil
     private lateinit var currentLocation: Location
+    private lateinit var adapter: DailyRecyclerViewAdapter
 
     companion object {
         fun newInstance() = CurrentLocationFragment()
@@ -30,7 +33,16 @@ class CurrentLocationFragment : Fragment()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? = inflater.inflate(R.layout.current_location_fragment, container, false)
+    ): View? {
+        val view = inflater.inflate(R.layout.current_location_fragment, container, false)
+
+        var rvDaily = view.findViewById(R.id.rvDaily) as RecyclerView
+        adapter = DailyRecyclerViewAdapter()
+        rvDaily.layoutManager = LinearLayoutManager(context)
+        rvDaily.adapter = adapter
+
+        return view
+    }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -72,10 +84,14 @@ class CurrentLocationFragment : Fragment()
             Picasso.get().load(url).into(ivIcon)
         }
 
-        forecast.daily?.data?.get(0)?.run {
-            // get the low and high from the current day
-            tvLowTemp.text = temperatureLow?.let { formatTemp(it) }
-            tvHighTemp.text = temperatureHigh?.let { formatTemp(it) }
+        forecast.daily?.data?.run {
+            val currentDay = firstOrNull()
+
+            currentDay?.run {
+                tvLowTemp.text = temperatureLow?.let { formatTemp(it) }
+                tvHighTemp.text = temperatureHigh?.let { formatTemp(it) }
+            }
+            adapter.setItems(this)
         }
 
         if (forecast.latitude != null && forecast.longitude != null) {
